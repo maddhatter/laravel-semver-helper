@@ -1,8 +1,9 @@
 <?php namespace MaddHatter\SemverHelper\Console;
 
+use Illuminate\Console\Command;
 use MaddHatter\SemverHelper\Changelog;
 
-class ChangesListCommand
+class ChangesListCommand extends Command
 {
     /**
      * The name and signature of the console command.
@@ -41,7 +42,13 @@ class ChangesListCommand
      */
     public function handle()
     {
-        $changelog = $this->changelog->load(config('semver-helper.changelog'))->changelog();
+        $path = config('semver-helper.changelog');
+        if ( ! \File::exists($path)) {
+            $this->error("No changelog exists at {$path}, use change:add to create it.");
+            return;
+        }
+
+        $changelog = $this->changelog->load($path)->changelog();
 
         if ($version = $this->argument('version')) {
             if (array_key_exists($version, $changelog)) {

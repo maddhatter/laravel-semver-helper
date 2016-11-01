@@ -2,6 +2,7 @@
 
 use Composer\Semver\VersionParser;
 use Illuminate\Console\Command;
+use MaddHatter\SemverHelper\Changelog;
 use Symfony\Component\Yaml\Parser;
 
 class TagVersionCommand extends Command
@@ -80,12 +81,15 @@ class TagVersionCommand extends Command
 
         $this->info("Setting dotted to {$dottedVersion}");
 
-        $changelog = $this->changelog->load(config('semver-helper.changelog'));
-        $changelog->tag($dottedVersion);
+        if (\File::exists(config('semver-helper.changelog'))) {
+            $this->changelog->load(config('semver-helper.changelog'));
+        }
 
-        if ( ! empty($changelog->changelog()[$dottedVersion])) {
+        $this->changelog->tag($dottedVersion);
+
+        if ( ! empty($this->changelog->changelog()[$dottedVersion])) {
             $this->info('The following changelog records will be tagged for this version:');
-            foreach ($changelog->changelog()[$dottedVersion] as $change) {
+            foreach ($this->changelog->changelog()[$dottedVersion] as $change) {
                 $this->info("\t{$change}");
             }
         } else {
@@ -95,11 +99,11 @@ class TagVersionCommand extends Command
         if ( ! $this->option('no-changes')) {
             while ($this->confirm('Would you like to add additional changes?')) {
                 $change = $this->ask('Enter change:');
-                $changelog->add($change, $dottedVersion);
+                $this->changelog->add($change, $dottedVersion);
             }
         }
 
-        $changelog->save(config('semver-helper.changelog'));
+        $this->changelog->save(config('semver-helper.changelog'));
         $this->saveVersion($version);
     }
 

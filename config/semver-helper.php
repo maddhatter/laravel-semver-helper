@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'changelog' => base_dir('changelog.php'),
+    'changelog' => base_path('changes.json'),
 ];

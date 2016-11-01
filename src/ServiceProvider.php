@@ -11,10 +11,10 @@ class ServiceProvider extends BaseServiceProvider
     public function register()
     {
         $this->publishes([
-            __DIR__ . '../config/semver-helper.php' => config_path('semver-helper.php'),
+            __DIR__ . '/../config/semver-helper.php' => config_path('semver-helper.php'),
         ], 'config');
 
-        $this->mergeConfigFrom(__DIR__ . '../config/semver-helper.php', 'semver-helper');
+        $this->mergeConfigFrom(__DIR__ . '/../config/semver-helper.php', 'semver-helper');
 
         $this->commands([
             ChangesListCommand::class,

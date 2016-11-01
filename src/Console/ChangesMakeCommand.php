@@ -1,8 +1,9 @@
 <?php namespace MaddHatter\SemverHelper\Console;
 
+use Illuminate\Console\Command;
 use MaddHatter\SemverHelper\Changelog;
 
-class ChangesMakeCommand
+class ChangesMakeCommand extends Command
 {
     /**
      * The name and signature of the console command.
@@ -41,13 +42,16 @@ class ChangesMakeCommand
      */
     public function handle()
     {
-        $changelog = $this->changelog->load(config('semver-helper.changelog'));
+        if (\File::exists(config('semver-helper.changelog'))) {
+            $this->changelog->load(config('semver-helper.changelog'));
+        }
+
 
         $version = $this->option('for');
-        $changelog->add($this->argument('message'), $version)->save(config('semver-helper.changelog'));
+        $this->changelog->add($this->argument('message'), $version)->save(config('semver-helper.changelog'));
 
         $this->info("Current changes for version [{$version}]:");
-        foreach($changelog->changelog()[$version] as $change) {
+        foreach($this->changelog->changelog()[$version] as $change) {
             $this->info("\t{$change}");
         }
     }
